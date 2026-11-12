@@ -1,51 +1,75 @@
-# CineSpot — Avance 1
+# CineSpot — Avance 3: mi diario de películas y series
 
-Proyecto T3: **Explorador de películas y series** (Programación del lado del cliente).
+Aplicación de **Programación Web / Tema 3** creada con **React + Vite**, sin backend ni API. Mejora del proyecto CineSpot Avance 2.
 
-## Tecnología
+## Funciones
 
-- React: biblioteca de interfaz, componentes y estado con `useState`.
-- Vite: entorno de desarrollo y compilación.
-- CSS: diseño adaptable a celular, tableta y computadora.
-- Los 20 títulos están en un arreglo de objetos (`src/data.js`). **No hay backend, base de datos ni API**.
-- Los pósteres son **ilustraciones originales de muestra**, no pósteres oficiales.
+- Catálogo de 20 películas y series desde un **arreglo de objetos** en `src/data.js`.
+- Pósters locales incluidos en `public/posters` (algunos pueden ser ilustrativos).
+- Búsqueda de título y filtros de tipo y género.
+- **Orden alfabético A–Z / Z–A**, y por año ascendente/descendente.
+- Ventana de detalle: sinopsis, duración o temporadas y capítulos.
+- **Registro e inicio de sesión locales**: perfiles guardados en un arreglo en `localStorage`.
+- Cada perfil tiene su **propio arreglo** de películas vistas, favoritos, calificaciones (1 a 5) y comentarios (máximo 500 caracteres).
+- Pestañas **Explorar, Favoritos, Ya vistas, Por ver** y estadísticas personales.
+- Las notas y comentarios persisten al recargar el navegador y después de salir/iniciar sesión en el mismo navegador.
+- Interfaz adaptable a celular y computadora.
 
-## Instalación y ejecución
+## Instalar
 
-1. Instala Node.js (versión moderna, compatible con Vite 7; Node 20.19+ o 22.12+).
-2. Abre esta carpeta en Visual Studio Code.
-3. Abre una terminal en la carpeta del proyecto.
-4. Ejecuta:
+En la carpeta que contiene `package.json`:
 
 ```bash
 npm install
 npm run dev
 ```
 
-5. Abre en el navegador la dirección que muestre la terminal (normalmente `http://localhost:5173`).
+En Windows/PowerShell, si npm.ps1 está bloqueado, utiliza `npm.cmd install` y `npm.cmd run dev`.
+Entra en la URL que muestre Vite, normalmente `http://localhost:5173/`. No abras `index.html` por doble clic.
+Para comprobar el proyecto: `npm run build`.
 
-Para generar una versión de distribución: `npm run build`.
+## Componentes y arreglos
 
-> **Importante:** no abras `index.html` directamente con doble clic; debes iniciar Vite desde la terminal.
+- `src/data.js`: `catalogo` (20 objetos).
+- `src/storage.js`: utilidades para guardar, consultar y actualizar el **arreglo de perfiles** y el **arreglo `lista`** de cada perfil.
+- `App.jsx`: estado con `useState`, filtros y ordenamientos con `useMemo`, navegación y perfiles.
+- `AuthModal.jsx`: formularios de registro/inicio de sesión.
+- `MovieCard.jsx`: tarjetas, estado de vista y favoritos.
+- `DetalleModal.jsx`: sinopsis, visto, favorito, calificación y comentario.
+- `StarRating.jsx` y `FilterBar.jsx`: estrellas y filtros reutilizables.
 
-## Componentes
+Ejemplo conceptual del arreglo de perfiles:
 
-- `App.jsx`: estructura, estado de la búsqueda, tipo y género; combinaciones de filtros con `useMemo`.
-- `components/FilterBar.jsx`: botones para elegir películas/series y selector de género. Recibe valores y eventos del componente principal por props.
-- `components/MovieCard.jsx`: muestra imagen ilustrativa, título, género, año y tipo de cada obra.
-- `data.js`: catálogo local de 20 objetos.
+```js
+[
+  { id: 'abc', nombre: 'usuario1', salt: '...', claveHash: '...', lista: [
+    { peliculaId: 1, vista: true, favorita: true, calificacion: 5, comentario: 'Me encantó' }
+  ] }
+]
+```
 
-## Estado real del avance
+## Importante: seguridad y límites de los perfiles
 
-**Implementado:** 20 películas/series, tarjetas con imagen y metadatos, búsqueda por título, filtros por tipo y género, mensaje si no hay resultados, diseño responsive.
+**Esta autenticación es únicamente una simulación local para una práctica escolar.** Los perfiles se almacenan en `localStorage`, separados por usuario pero **no protegidos frente a quien tenga acceso al navegador**. La contraseña se almacena como un resumen SHA-256 con sal, no en texto plano, pero eso **no convierte este prototipo en un sistema de autenticación seguro**: cualquiera con acceso a las herramientas del navegador puede alterar los datos. No uses contraseñas reales. No existe sincronización entre dispositivos, recuperación de cuenta ni base de datos. Borrar datos del sitio elimina perfiles y reseñas. Para usuarios reales sería necesario un backend con autenticación y almacenamiento seguros.
 
-**Pendiente para el segundo avance:** al seleccionar una tarjeta, abrir información detallada (sinopsis, año, duración o temporadas); marcar y desmarcar favoritos y mostrar una sección de favoritos.
+Las calificaciones del avance anterior se guardaban globalmente y no se asignan automáticamente a ninguna cuenta nueva para evitar mezclar usuarios.
 
-## Pruebas sugeridas
+## Pruebas recomendadas
 
-1. Buscar `coco`: debe salir Coco.
-2. Seleccionar `Series`: mostrar únicamente series.
-3. Elegir género `Misterio`: mostrar obras de misterio.
-4. Combinar `Series` + `Misterio` + búsqueda `dark`: debe mostrar Dark.
-5. Buscar un título inexistente: mostrar un aviso y botón para restablecer filtros.
-6. Reducir el ancho de la ventana para comprobar que la cuadrícula se adapta.
+1. Sin registrarte, prueba la búsqueda y el orden A–Z/Z–A.
+2. Crea el perfil `demo1` con una contraseña de prueba de 6+ caracteres.
+3. Abre Coco; márcala como vista, favorita, califícala y deja un comentario.
+4. Cambia a las secciones Favoritos y Ya vistas; comprueba que Coco aparece.
+5. Cierra sesión y crea otro perfil: no debe ver las listas de `demo1`.
+6. Vuelve a `demo1`: sus cambios deben permanecer.
+7. Prueba filtros combinados, el orden por año, episodios y la vista móvil.
+
+## GitHub (proyecto existente)
+
+Copia los archivos de este avance sobre tu carpeta local conectada a GitHub, **sin borrar `.git`** y sin copiar `node_modules` ni `dist`. Después:
+
+```bash
+git add .
+git commit -m "Avance 3: perfiles locales, vistas, comentarios y orden alfabetico"
+git push origin main
+```
