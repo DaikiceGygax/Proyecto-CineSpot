@@ -1,0 +1,27 @@
+GUION BREVE — CINESPOT (ENTREGA FINAL)
+
+1. ¿Qué es?
+CineSpot es un explorador web de películas y series con un diario personal de contenido visto.
+
+2. ¿Qué tecnología empleamos?
+React para los componentes y los estados, Vite para ejecutar el proyecto, JavaScript para arreglos y lógica, CSS para diseño responsivo.
+
+3. ¿Cómo guardamos los datos?
+El catálogo es un arreglo de 20 objetos en data.js. Cada cuenta de demostración tiene un arreglo independiente de favoritos, vistas, calificaciones y comentarios. Se persiste mediante localStorage.
+
+4. ¿Qué componentes utilizamos?
+App, MovieCard, FilterBar, DetalleModal, AuthModal y StarRating.
+
+5. ¿Qué funciones enseñamos?
+Buscar, filtrar, ordenar A–Z, abrir una película, registrar o entrar en modo demo, marcar vista, agregar a favoritos, calificar y comentar; entrar a Mis reseñas.
+
+6. ¿Cómo mostramos que funciona el estado?
+Al cambiar los filtros o pulsar una estrella, la interfaz se actualiza automáticamente sin recargar toda la página.
+
+7. ¿Qué límites tiene?
+Es un prototipo escolar sin backend. Los usuarios están guardados localmente, no son cuentas seguras reales y los cambios no se sincronizan entre dispositivos.
+
+8. Cierre
+El proyecto cumple el objetivo de practicar componentes, arreglos, manejo de estado, eventos y renderizado dinámico mediante React.
+
+CÓDIGO PARA DIAPOSITIVAS: consultar PRESENTACION_CODIGO.md.

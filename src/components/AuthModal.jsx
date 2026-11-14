@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-export default function AuthModal({ onClose, onSubmit }) {
+export default function AuthModal({ onClose, onSubmit, onDemo }) {
   const [modo, setModo] = useState('entrar');
   const [nombre, setNombre] = useState('');
   const [clave, setClave] = useState('');
@@ -39,6 +39,7 @@ export default function AuthModal({ onClose, onSubmit }) {
         {mensaje && <p className="auth-error" role="alert">{mensaje}</p>}
         <button className="primary-btn" disabled={cargando} type="submit">{cargando ? 'Procesando…' : modo === 'entrar' ? 'Entrar a mi cuenta' : 'Crear perfil'}</button>
       </form>
+      <div className="demo-access"><span>¿Solo quieres probar el proyecto?</span><button type="button" className="outline-btn" onClick={onDemo}>Entrar al perfil de demostración</button></div>
       <p className="privacy-note">Demo escolar: las cuentas solo existen en este navegador. No uses contraseñas reales; no hay recuperación de cuenta ni sincronización entre dispositivos.</p>
     </section>
   </div>;

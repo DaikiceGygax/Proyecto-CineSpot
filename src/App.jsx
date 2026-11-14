@@ -14,6 +14,7 @@ export default function App() {
   const [perfiles, setPerfiles] = useState(cargarPerfiles);
   const [usuarioId, setUsuarioId] = useState(sesionActual);
   const [authAbierto, setAuthAbierto] = useState(false);
+  const [aviso, setAviso] = useState('');
   const [busqueda, setBusqueda] = useState('');
   const [tipo, setTipo] = useState('Todos');
   const [genero, setGenero] = useState('Todos');
@@ -31,7 +32,9 @@ export default function App() {
   const actualizar = (peliculaId, cambios) => {
     if (!perfil) { setAuthAbierto(true); return; }
     const siguientes = perfiles.map(p => p.id !== perfil.id ? p : {...p, lista: actualizarFicha(p.lista, peliculaId, cambios)});
-    if (!actualizarPerfiles(siguientes)) window.alert('No se pudieron guardar los cambios en este navegador. Revisa el almacenamiento disponible.');
+    if (!actualizarPerfiles(siguientes)) { setAviso('No se pudieron guardar los cambios. Comprueba el espacio disponible en el navegador.'); return false; }
+    setAviso('');
+    return true;
   };
   const cambiarFavorito = id => actualizar(id, {favorita: !fichaDe(id)?.favorita});
   const cerrarDetalle = useCallback(() => setSeleccionadoId(null), []);
@@ -52,13 +55,26 @@ export default function App() {
     if (!existente || existente.claveHash !== await hashClave(clave, existente.salt)) return 'Usuario o contraseña incorrectos.';
     guardarSesion(existente.id); setUsuarioId(existente.id); setAuthAbierto(false); return null;
   };
+  const entrarDemo = () => {
+    const id = 'perfil-demo-cinespot';
+    if (!perfiles.some(p => p.id === id)) {
+      const demo = {id, nombre: 'Demo CineSpot', esDemo: true, lista: [
+        {peliculaId: 1, vista: true, favorita: true, calificacion: 5, comentario: 'Una aventura espacial inolvidable.'},
+        {peliculaId: 2, vista: true, favorita: true, calificacion: 4, comentario: 'Una historia emocionante y llena de música.'},
+        {peliculaId: 14, vista: false, favorita: true, calificacion: 0, comentario: ''}
+      ]};
+      if (!actualizarPerfiles([...perfiles, demo])) return 'No se pudo crear el perfil de demostración.';
+    }
+    guardarSesion(id); setUsuarioId(id); setAuthAbierto(false); setSeccion('todos'); setAviso('');
+    return null;
+  };
   const cerrarSesion = () => { guardarSesion(null); setUsuarioId(null); setSeccion('todos'); setSeleccionadoId(null); };
   const elegirSeccion = nueva => { if (nueva !== 'todos' && !perfil) {setAuthAbierto(true); return;} setSeccion(nueva); };
 
   const resultados = useMemo(() => {
     const texto = busqueda.trim().toLocaleLowerCase('es');
     return catalogo.filter(p => p.titulo.toLocaleLowerCase('es').includes(texto) && (tipo === 'Todos' || p.tipo === tipo) && (genero === 'Todos' || p.genero === genero) && (
-      seccion === 'todos' || (perfil && (seccion === 'favoritos' ? obtenerFicha(perfil,p.id)?.favorita : seccion === 'vistas' ? obtenerFicha(perfil,p.id)?.vista : !obtenerFicha(perfil,p.id)?.vista))
+      seccion === 'todos' || (perfil && (seccion === 'favoritos' ? obtenerFicha(perfil,p.id)?.favorita : seccion === 'vistas' ? obtenerFicha(perfil,p.id)?.vista : seccion === 'resenas' ? Boolean(obtenerFicha(perfil,p.id)?.comentario?.trim()) : !obtenerFicha(perfil,p.id)?.vista))
     )).sort((a,b) => {
       if (orden === 'az') return colacion.compare(a.titulo,b.titulo);
       if (orden === 'za') return colacion.compare(b.titulo,a.titulo);
@@ -69,14 +85,14 @@ export default function App() {
   const limpiar = () => {setBusqueda('');setTipo('Todos');setGenero('Todos');setSeccion('todos');setOrden('az');};
   const totalVistas = perfil?.lista.filter(f => f.vista).length ?? 0;
   const totalFavoritos = perfil?.lista.filter(f => f.favorita).length ?? 0;
-  const totalComentarios = perfil?.lista.filter(f => f.comentario).length ?? 0;
+  const totalComentarios = perfil?.lista.filter(f => f.comentario?.trim()).length ?? 0;
   const seleccionado = catalogo.find(p => p.id === seleccionadoId);
 
   return <div className="app-shell">
     <header className="site-header">
       <a className="brand" href="#inicio"><span className="brand-icon">✦</span> Cine<span>Spot</span></a>
       <div className="header-actions">
-        <span className="header-tag">Proyecto escolar · Avance 3</span>
+        <span className="header-tag">Proyecto escolar · Versión final</span>
         {perfil ? <><span className="welcome-name">Hola, <strong>{perfil.nombre}</strong></span><button type="button" className="outline-btn" onClick={cerrarSesion}>Salir</button></> : <button className="primary-btn header-login" onClick={() => setAuthAbierto(true)}>Entrar / Registrarme</button>}
       </div>
     </header>
@@ -85,14 +101,15 @@ export default function App() {
       {perfil && <section className="dashboard" aria-label="Resumen de tu perfil"><div><span className="eyebrow">TU BIBLIOTECA PERSONAL</span><h2>El rincón de {perfil.nombre}</h2><p>Tu progreso queda guardado en este navegador.</p></div><div className="dashboard-stats"><div><strong>{totalVistas}</strong><span>Vistas</span></div><div><strong>{totalFavoritos}</strong><span>Favoritas</span></div><div><strong>{totalComentarios}</strong><span>Reseñas</span></div></div></section>}
       <section className="catalog-section" aria-labelledby="catalog-title">
         <div className="section-heading"><div><span className="eyebrow">EXPLORA NUESTRO CATÁLOGO</span><h2 id="catalog-title">Películas y series</h2></div><p>{resultados.length} {resultados.length === 1 ? 'resultado' : 'resultados'}</p></div>
-        <nav className="library-tabs" aria-label="Tu biblioteca">{[['todos','Explorar'],['favoritos',`♡ Favoritos ${perfil ? `(${totalFavoritos})` : ''}`],['vistas',`✓ Ya vistas ${perfil ? `(${totalVistas})` : ''}`],['pendientes','Por ver']].map(([key,text]) => <button type="button" key={key} onClick={() => elegirSeccion(key)} className={seccion === key ? 'active' : ''} aria-current={seccion === key ? 'page' : undefined}>{text}</button>)}</nav>
+        <nav className="library-tabs" aria-label="Tu biblioteca">{[['todos','Explorar'],['favoritos',`♡ Favoritos ${perfil ? `(${totalFavoritos})` : ''}`],['vistas',`✓ Ya vistas ${perfil ? `(${totalVistas})` : ''}`],['pendientes','Por ver'],['resenas',`✎ Mis reseñas ${perfil ? `(${totalComentarios})` : ''}`]].map(([key,text]) => <button type="button" key={key} onClick={() => elegirSeccion(key)} className={seccion === key ? 'active' : ''} aria-current={seccion === key ? 'page' : undefined}>{text}</button>)}</nav>
         <label className="search-box"><span className="search-symbol" aria-hidden="true">⌕</span><span className="sr-only">Buscar por título</span><input type="search" placeholder="Buscar películas o series..." value={busqueda} onChange={e => setBusqueda(e.target.value)}/></label>
         <div className="toolbar"><FilterBar tipo={tipo} setTipo={setTipo} genero={genero} setGenero={setGenero} generos={generos}/><label className="sort-label">Ordenar por <select value={orden} onChange={e => setOrden(e.target.value)}>{opcionesOrden.map(o => <option key={o.valor} value={o.valor}>{o.texto}</option>)}</select></label></div>
+        {aviso && <p className="save-alert" role="alert">{aviso}</p>}
         {resultados.length ? <div className="movie-grid">{resultados.map(p => <MovieCard key={p.id} elemento={p} ficha={fichaDe(p.id)} perfil={perfil} onSelect={setSeleccionadoId} onFavorite={cambiarFavorito}/>)}</div> : <div className="empty-state"><div className="empty-icon">⌕</div><h3>No encontramos resultados</h3><p>Prueba con otros filtros o agrega títulos a tu lista.</p><button onClick={limpiar}>Mostrar todo el catálogo</button></div>}
       </section>
     </main>
     <footer className="footer">CineSpot · Proyecto T3 · Programación del lado del cliente <span>React · Arrays · localStorage</span></footer>
     {seleccionado && <DetalleModal key={seleccionado.id} elemento={seleccionado} ficha={fichaDe(seleccionado.id)} perfil={perfil} onActualizar={actualizar} onSolicitarLogin={() => {setSeleccionadoId(null);setAuthAbierto(true);}} onCerrar={cerrarDetalle}/>} 
-    {authAbierto && <AuthModal onClose={() => setAuthAbierto(false)} onSubmit={autenticar}/>}
+    {authAbierto && <AuthModal onClose={() => setAuthAbierto(false)} onSubmit={autenticar} onDemo={entrarDemo}/>}
   </div>;
 }

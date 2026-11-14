@@ -42,7 +42,7 @@ export default function DetalleModal({ elemento, ficha, perfil, onActualizar, on
           <h3 className="modal-sub">Tu calificación personal</h3>
           <div className="rating-row"><StarRating valor={ficha?.calificacion ?? 0} onChange={n => cambiar({calificacion: n})}/><span className="rating-text">{ficha?.calificacion ? `${ficha.calificacion} de 5 estrellas` : 'Sin calificar'}</span>{Boolean(ficha?.calificacion) && <button className="link-btn" onClick={() => cambiar({calificacion: 0})}>Quitar</button>}</div>
           <h3 className="modal-sub">Tu comentario</h3>
-          <form className="review-form" onSubmit={e => { e.preventDefault(); cambiar({comentario: comentario.trim()}); setGuardado(true); }}>
+          <form className="review-form" onSubmit={e => { e.preventDefault(); const correcto = cambiar({comentario: comentario.trim()}); setGuardado(correcto === true); }}>
             <label className="sr-only" htmlFor="review-text">Tu reseña de {elemento.titulo}</label>
             <textarea id="review-text" maxLength={500} rows={4} placeholder="¿Qué te pareció? Escribe tu opinión personal..." value={comentario} onChange={e => { setComentario(e.target.value); setGuardado(false); }}/>
             <div className="review-bottom"><span>{comentario.length}/500 caracteres {guardado && '· ¡Guardado!'}</span><button type="submit" className="primary-btn">Guardar comentario</button></div>

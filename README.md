@@ -1,75 +1,94 @@
-# CineSpot — Avance 3: mi diario de películas y series
+# CineSpot — Proyecto final T3: Explorador de películas y series
 
-Aplicación de **Programación Web / Tema 3** creada con **React + Vite**, sin backend ni API. Mejora del proyecto CineSpot Avance 2.
+**React 19 + Vite 7 · Aplicación web de programación del lado del cliente.**
 
-## Funciones
+CineSpot permite explorar un catálogo de **20 películas y series** con pósters incluidos en el proyecto, buscar por título, filtrar, ordenar, consultar fichas y administrar bibliotecas por perfil local.
 
-- Catálogo de 20 películas y series desde un **arreglo de objetos** en `src/data.js`.
-- Pósters locales incluidos en `public/posters` (algunos pueden ser ilustrativos).
-- Búsqueda de título y filtros de tipo y género.
-- **Orden alfabético A–Z / Z–A**, y por año ascendente/descendente.
-- Ventana de detalle: sinopsis, duración o temporadas y capítulos.
-- **Registro e inicio de sesión locales**: perfiles guardados en un arreglo en `localStorage`.
-- Cada perfil tiene su **propio arreglo** de películas vistas, favoritos, calificaciones (1 a 5) y comentarios (máximo 500 caracteres).
-- Pestañas **Explorar, Favoritos, Ya vistas, Por ver** y estadísticas personales.
-- Las notas y comentarios persisten al recargar el navegador y después de salir/iniciar sesión en el mismo navegador.
-- Interfaz adaptable a celular y computadora.
+## Funciones disponibles
 
-## Instalar
+- Catálogo generado desde un arreglo de objetos (`src/data.js`).
+- Tarjetas con título, género, año, tipo e imagen local; imagen de respaldo en caso de error.
+- Búsqueda por título y filtros combinados por género y tipo.
+- Orden **A–Z**, **Z–A**, por año más reciente y más antiguo.
+- Ficha de detalle con sinopsis, duración o temporadas y listado de capítulos.
+- Registro e inicio de sesión **solo locales** para la demostración escolar.
+- Por perfil: favoritos, títulos vistos, títulos por ver, calificación de 1 a 5 y comentarios de hasta 500 caracteres.
+- Sección **Mis reseñas** y contadores de biblioteca.
+- **Perfil de demostración** accesible con el botón «Entrar al perfil de demostración», sin necesidad de crear una cuenta; trae reseñas y listas de ejemplo que se pueden editar.
+- Persistencia local con `localStorage` y sesión de pestaña con `sessionStorage`.
+- Interfaz adaptable a dispositivos móviles.
 
-En la carpeta que contiene `package.json`:
+## Requisitos e instalación
+
+Instalar **Node.js** y npm. Abrir la carpeta que contiene `package.json`, NO el archivo HTML directamente.
 
 ```bash
 npm install
 npm run dev
 ```
 
-En Windows/PowerShell, si npm.ps1 está bloqueado, utiliza `npm.cmd install` y `npm.cmd run dev`.
-Entra en la URL que muestre Vite, normalmente `http://localhost:5173/`. No abras `index.html` por doble clic.
-Para comprobar el proyecto: `npm run build`.
+Abrir la dirección indicada por Vite, generalmente `http://localhost:5173/`.
 
-## Componentes y arreglos
-
-- `src/data.js`: `catalogo` (20 objetos).
-- `src/storage.js`: utilidades para guardar, consultar y actualizar el **arreglo de perfiles** y el **arreglo `lista`** de cada perfil.
-- `App.jsx`: estado con `useState`, filtros y ordenamientos con `useMemo`, navegación y perfiles.
-- `AuthModal.jsx`: formularios de registro/inicio de sesión.
-- `MovieCard.jsx`: tarjetas, estado de vista y favoritos.
-- `DetalleModal.jsx`: sinopsis, visto, favorito, calificación y comentario.
-- `StarRating.jsx` y `FilterBar.jsx`: estrellas y filtros reutilizables.
-
-Ejemplo conceptual del arreglo de perfiles:
-
-```js
-[
-  { id: 'abc', nombre: 'usuario1', salt: '...', claveHash: '...', lista: [
-    { peliculaId: 1, vista: true, favorita: true, calificacion: 5, comentario: 'Me encantó' }
-  ] }
-]
-```
-
-## Importante: seguridad y límites de los perfiles
-
-**Esta autenticación es únicamente una simulación local para una práctica escolar.** Los perfiles se almacenan en `localStorage`, separados por usuario pero **no protegidos frente a quien tenga acceso al navegador**. La contraseña se almacena como un resumen SHA-256 con sal, no en texto plano, pero eso **no convierte este prototipo en un sistema de autenticación seguro**: cualquiera con acceso a las herramientas del navegador puede alterar los datos. No uses contraseñas reales. No existe sincronización entre dispositivos, recuperación de cuenta ni base de datos. Borrar datos del sitio elimina perfiles y reseñas. Para usuarios reales sería necesario un backend con autenticación y almacenamiento seguros.
-
-Las calificaciones del avance anterior se guardaban globalmente y no se asignan automáticamente a ninguna cuenta nueva para evitar mezclar usuarios.
-
-## Pruebas recomendadas
-
-1. Sin registrarte, prueba la búsqueda y el orden A–Z/Z–A.
-2. Crea el perfil `demo1` con una contraseña de prueba de 6+ caracteres.
-3. Abre Coco; márcala como vista, favorita, califícala y deja un comentario.
-4. Cambia a las secciones Favoritos y Ya vistas; comprueba que Coco aparece.
-5. Cierra sesión y crea otro perfil: no debe ver las listas de `demo1`.
-6. Vuelve a `demo1`: sus cambios deben permanecer.
-7. Prueba filtros combinados, el orden por año, episodios y la vista móvil.
-
-## GitHub (proyecto existente)
-
-Copia los archivos de este avance sobre tu carpeta local conectada a GitHub, **sin borrar `.git`** y sin copiar `node_modules` ni `dist`. Después:
+Para generar una versión de distribución:
 
 ```bash
+npm run build
+npm run preview
+```
+
+En Windows PowerShell, si `npm.ps1` está bloqueado, usar `npm.cmd install`, `npm.cmd run dev` y `npm.cmd run build`. Si Node se maneja con fnm:
+
+```powershell
+fnm env --use-on-cd | Out-String | Invoke-Expression
+fnm use 26
+npm.cmd install
+npm.cmd run dev
+```
+
+## Arquitectura y componentes
+
+| Archivo | Función |
+| --- | --- |
+| `src/data.js` | Arreglo local `catalogo` con 20 objetos; año, género, sinopsis y demás campos. |
+| `src/App.jsx` | Estados `useState`, búsquedas, filtros, orden `useMemo`, secciones y perfil activo. |
+| `src/storage.js` | Perfiles locales; lectura y escritura de arreglos; fichas por película. |
+| `src/components/MovieCard.jsx` | Tarjetas del catálogo. |
+| `src/components/FilterBar.jsx` | Filtro por tipo y género. |
+| `src/components/DetalleModal.jsx` | Sinopsis, capítulos, visto, favorito, estrellas y comentarios. |
+| `src/components/AuthModal.jsx` | Registro, inicio de sesión y acceso a la demostración. |
+| `src/components/StarRating.jsx` | Selector interactivo de 1 a 5 estrellas. |
+| `src/styles.css` | Diseño, estilos responsivos y accesibilidad visual. |
+
+## Cómo demostrarlo en clase
+
+1. Iniciar Vite y mostrar los 20 títulos.
+2. Buscar «Coco», filtrar por género y ordenar A–Z/Z–A.
+3. Abrir una tarjeta para explicar la sinopsis y el detalle de episodios de una serie.
+4. Seleccionar **Entrar / Registrarme → Entrar al perfil de demostración**.
+5. Ir a Favoritos, Ya vistas y Mis reseñas; abrir Interstellar para ver sus 5 estrellas y opinión.
+6. Modificar la calificación y comentar, guardar, cerrar sesión y volver a entrar al perfil demo para comprobar persistencia.
+7. Registrar un usuario nuevo y comprobar que sus listas no contienen datos del demo.
+8. Enseñar la adaptación móvil con las herramientas del navegador.
+
+## Seguridad, límites y observaciones
+
+Esta es una **simulación de perfiles para una materia de frontend**, no un sistema de autenticación real: la información se almacena y puede modificarse desde las herramientas del mismo navegador. Las contraseñas de cuentas de prueba se resumen localmente, pero **no se deben usar contraseñas reales**. Los datos NO se comparten entre computadoras ni se almacenan en un servidor. La limpieza de datos del sitio borra cuentas y reseñas.
+
+Los pósters se incluyen como recursos locales con fines de demostración académica. No se consume API y no se requiere backend ni base de datos. Algunos datos de episodios sin títulos detallados aparecen como «Capítulo N».
+
+## Subir al repositorio ya existente
+
+No borres `.git` de la carpeta original conectada con GitHub. Copia **el contenido** de este proyecto sobre ella (no copies `node_modules` ni `dist`). Ejecuta:
+
+```bash
+git status
 git add .
-git commit -m "Avance 3: perfiles locales, vistas, comentarios y orden alfabetico"
+git commit -m "Entrega final: CineSpot con perfiles, reseñas y demo"
 git push origin main
 ```
+
+Repositorio de entrega: https://github.com/DaikiceGygax/Proyecto-CineSpot
+
+## Material para presentación
+
+Ver `PRESENTACION_CODIGO.md` y `GUION_PRESENTACION.txt`: resumen para diapositivas con fragmentos reales de código y explicaciones.
